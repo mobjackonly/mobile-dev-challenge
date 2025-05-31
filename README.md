@@ -62,7 +62,7 @@ Please make your forked repository **private**, and then:
 
 Although there are 5 pull requests, each task is small and focused.
 
-> 💡 **With AI assistance, this entire challenge should take less than 1 hour to complete.**
+> 💡 **With AI assistance, this entire challenge should take less than fews hour to complete.** (Time is not a requirment)
 
 We care more about **code clarity**, **correctness**, and **attention to detail** than how fast you finish.
 
