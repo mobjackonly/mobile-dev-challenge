@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Noodle } from "../types";
 import { router } from "expo-router";
-import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+import { moderateScale, scale } from "react-native-size-matters";
 
 const GET_NOODLE_DETAILS = gql`
   query GetNoodleDetails($id: ID!) {
@@ -18,6 +18,7 @@ const GET_NOODLE_DETAILS = gql`
       spicinessLevel
       originCountry
       imageURL
+      reviewsCount
     }
   }
 `;
@@ -25,17 +26,28 @@ const GET_NOODLE_DETAILS = gql`
 type Props = {
   id: string;
   name: string;
+  spicinessLevel?: number;
+  originCountry?: string;
+  reviewsCount?: number;
+  imageURL?: string;
 };
 
-export function NoodleItem({ id, name }: Props) {
+export function NoodleItem({ id, name, spicinessLevel, originCountry, reviewsCount, imageURL }: Props) {
   const { loading, data } = useQuery<{ instantNoodle: Noodle }>(
     GET_NOODLE_DETAILS,
     {
       variables: { id },
+      skip: spicinessLevel !== undefined && originCountry !== undefined && imageURL !== undefined,
     }
   );
 
-  const noodle = data?.instantNoodle;
+  const noodle = data?.instantNoodle || {
+    name,
+    spicinessLevel: spicinessLevel || 1,
+    originCountry: originCountry || '',
+    imageURL: imageURL || '',
+    reviewsCount: reviewsCount || 0,
+  };
 
   if (loading)
     return (
@@ -56,13 +68,13 @@ export function NoodleItem({ id, name }: Props) {
           source={{ uri: noodle.imageURL }}
           style={styles.imageBackground}
           resizeMode="stretch"
-        >
-          <View style={styles.overlay}>
+        >          <View style={styles.overlay}>
             <Text style={styles.spicinessText}>
               {"🔥".repeat(noodle.spicinessLevel)}
             </Text>
             <Text style={styles.nameText}>{noodle.name}</Text>
             <Text style={styles.countryText}>{`#${noodle.originCountry}`}</Text>
+            <Text style={styles.reviewsText}>💬 {noodle.reviewsCount} reviews</Text>
           </View>
         </ImageBackground>
       )}
@@ -99,10 +111,15 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(18),
     color: "white",
     textAlign: "center",
-  },
-  countryText: {
+  },  countryText: {
     fontSize: moderateScale(12),
     color: "white",
     textAlign: "center",
+  },
+  reviewsText: {
+    fontSize: moderateScale(10),
+    color: "white",
+    textAlign: "center",
+    opacity: 0.9,
   },
 });
