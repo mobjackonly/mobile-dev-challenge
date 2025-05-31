@@ -12,6 +12,32 @@ import { allowAll } from '@keystone-6/core/access';
 export const lists = {
   InstantNoodle: list({
     access: allowAll,
+    hooks: {
+      resolveInput: async ({ operation, resolvedData, item }) => {
+        // Update lastReviewedAt when reviewsCount increases
+        if (operation === 'update' && resolvedData.reviewsCount !== undefined) {
+          const currentReviewsCount = item?.reviewsCount || 0;
+          const newReviewsCount = resolvedData.reviewsCount;
+          
+          if (newReviewsCount > currentReviewsCount) {
+            resolvedData.lastReviewedAt = new Date();
+          }
+        }
+        
+        return resolvedData;
+      },
+      validateInput: async ({ operation, resolvedData, item, addValidationError }) => {
+        // Prevent decreasing reviewsCount
+        if (operation === 'update' && resolvedData.reviewsCount !== undefined) {
+          const currentReviewsCount = item?.reviewsCount || 0;
+          const newReviewsCount = resolvedData.reviewsCount;
+          
+          if (newReviewsCount < currentReviewsCount) {
+            addValidationError('reviewsCount cannot be decreased');
+          }
+        }
+      },
+    },
     fields: {
       name: text({
         validation: { isRequired: true },
@@ -66,14 +92,16 @@ export const lists = {
         },
         defaultValue: 5,
         ui: { description: 'Your personal rating (1–10)' },
-      }),
-      reviewsCount: integer({
+      }),      reviewsCount: integer({
         validation: {
           isRequired: true,
           min: 0,
         },
         defaultValue: 0,
         ui: { description: 'Number of reviews for this noodle' },
+      }),
+      lastReviewedAt: timestamp({
+        ui: { description: 'Last time this noodle was reviewed' },
       }),
       imageURL: text({
         validation: { isRequired: false },
