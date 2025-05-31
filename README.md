@@ -38,7 +38,7 @@ Found in [`Frontend-Task.md`](./Frontend-Task.md)
 
 ## ✅ Submission Instructions
 
-Submit your work as **5 pull requests**, one for each of the grouped tasks:
+Submit your work as **5 pull requests to your private repo**, one for each of the grouped tasks:
 
 | Task Group                 | PR Description                            |
 | -------------------------- | ----------------------------------------- |
